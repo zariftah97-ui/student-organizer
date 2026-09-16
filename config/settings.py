@@ -8,8 +8,12 @@ load_dotenv(BASE_DIR / '.env')
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-studyos-local-dev-key')
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-# Render এবং Localhost সাপোর্ট করার জন্য Allowed Hosts
+# Render-এর সকল ডোমেইন ও CSRF ট্রাস্টেড অরিজিন
 ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.onrender.com',
+    'https://student-organizer-9j39.onrender.com',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
