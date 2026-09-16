@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Grades · StudyOS{% endblock %}
+{% block content %}
+<section class="page-head"><div><p class="eyebrow">PERFORMANCE</p><h1>Grades</h1><p>Track components and understand your current standing.</p></div><a class="primary" href="{% url 'grade_new' %}">+ Add component</a></section>
+<section class="stats grade-summary">
+  <article><span>Overall CGPA</span><strong>{{ cgpa|floatformat:2 }}</strong></article>
+  {% for semester,gpa,credits in semester_rows|slice:':3' %}<article><span>{{ semester.name }} GPA</span><strong>{{ gpa|floatformat:2 }}</strong><small>{{ credits }} credits</small></article>{% empty %}<article><span>Semester GPA</span><strong>—</strong></article>{% endfor %}
+</section>
+<div class="grade-grid">
+{% for c,score,maximum,percent,letter,point in rows %}
+  <article class="panel grade-card">
+    <span class="grade-letter">{{ letter }}</span>
+    <div><h2>{{ c.name }}</h2><p>{{ score|floatformat:2 }} / {{ maximum|floatformat:2 }} marks · {{ percent|floatformat:1 }}%</p><small>{{ point }} grade points · {{ c.credit }} credits</small></div>
+    <div class="components">
+      {% for comp in c.components.all %}
+      <div><span>{{ comp.label }}</span><b>{{ comp.score|default:'–' }} / {{ comp.maximum }}</b><span class="component-actions"><a href="{% url 'grade_edit' comp.id %}">Edit</a><form method="post" action="{% url 'grade_delete' comp.id %}">{% csrf_token %}<button type="submit">Delete</button></form></span></div>
+      {% empty %}<div class="empty">No components yet.</div>{% endfor %}
+    </div>
+  </article>
+{% empty %}<div class="empty large">No grade data yet.<br><small>Add a grade component for one of your courses.</small></div>{% endfor %}
+</div>
+{% endblock %}

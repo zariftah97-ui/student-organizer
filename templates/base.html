@@ -1,0 +1,73 @@
+{% load static %}
+<!doctype html>
+<html lang="en" data-theme="{{ studyos_theme|default:'light' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#6f9d70">
+  <meta name="description" content="StudyOS — your student command center">
+  <title>{% block title %}StudyOS{% endblock %}</title>
+  <link rel="manifest" href="{% static 'manifest.json' %}">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>
+{% if request.user.is_authenticated %}
+<div class="shell">
+  <aside class="sidebar">
+    <a class="brand" href="{% url 'dashboard' %}">Study<span>OS</span></a>
+    <nav aria-label="Main navigation">
+      {% with n=request.resolver_match.url_name %}
+      <a class="{% if n == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">⌂ <span>Dashboard</span></a>
+      <a class="{% if 'course' in n %}active{% endif %}" href="{% url 'courses' %}">◈ <span>Courses</span></a>
+      <a class="{% if 'academic' in n %}active{% endif %}" href="{% url 'academic' %}">▦ <span>Semesters</span></a>
+      <a class="{% if 'topic' in n %}active{% endif %}" href="{% url 'topics' %}">☷ <span>Syllabus</span></a>
+      <a class="{% if 'task' in n %}active{% endif %}" href="{% url 'tasks' %}">✓ <span>Tasks</span></a>
+      <a class="{% if 'grade' in n %}active{% endif %}" href="{% url 'grades' %}">◎ <span>Grades</span></a>
+      <a class="{% if 'note' in n %}active{% endif %}" href="{% url 'notes' %}">▤ <span>Notes</span></a>
+      <a class="{% if 'calendar' in n %}active{% endif %}" href="{% url 'calendar' %}">□ <span>Calendar</span></a>
+      <a class="{% if 'file' in n %}active{% endif %}" href="{% url 'files' %}">↥ <span>Files</span></a>
+      <a class="{% if n == 'ai' %}active{% endif %}" href="{% url 'ai' %}">✦ <span>StudyOS AI</span></a>
+      {% endwith %}
+    </nav>
+    <div class="side-bottom">
+      <a href="{% url 'settings' %}">⚙ <span>Settings</span></a>
+      <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button type="submit">↪ <span>Logout</span></button></form>
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <button class="menu" type="button" aria-label="Open navigation">☰</button>
+      <form class="search" action="{% url 'search' %}" role="search">
+        <input name="q" placeholder="Search your study space…" value="{{ q|default:'' }}" autocomplete="off">
+        <button type="submit" aria-label="Search">⌕</button>
+      </form>
+      <a class="avatar" href="{% url 'settings' %}" aria-label="Open settings">{{ request.user.first_name|default:request.user.username|slice:':1'|upper }}</a>
+    </header>
+
+    {% if messages %}
+    <div class="toasts" aria-live="polite">
+      {% for message in messages %}<div class="toast">{{ message }}</div>{% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+<nav class="mobile-nav" aria-label="Mobile navigation">
+  <a href="{% url 'dashboard' %}">⌂<small>Home</small></a>
+  <a href="{% url 'courses' %}">◈<small>Courses</small></a>
+  <a href="{% url 'tasks' %}">✓<small>Tasks</small></a>
+  <a href="{% url 'grades' %}">◎<small>Grades</small></a>
+  <a href="{% url 'settings' %}">•••<small>More</small></a>
+</nav>
+{% else %}
+<main class="public-main">
+  {% block public_content %}{% endblock %}
+</main>
+{% endif %}
+<script src="{% static 'js/main.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

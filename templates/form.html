@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }} · StudyOS{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">STUDYOS</p>
+    <h1>{{ title }}</h1>
+    <p>{% if object %}Update your saved item.{% else %}Add it to your student command center.{% endif %}</p>
+  </div>
+</section>
+<section class="panel form-panel">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="error">{{ form.non_field_errors|striptags }}</div>{% endif %}
+    {% for field in form %}
+      <p>
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<small class="muted">{{ field.help_text|striptags }}</small>{% endif %}
+        {% if field.errors %}<span class="error">{{ field.errors|striptags }}</span>{% endif %}
+      </p>
+    {% endfor %}
+    <div class="actions">
+      <a href="javascript:history.back()">Cancel</a>
+      <button class="primary" type="submit">Save {{ title }}</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

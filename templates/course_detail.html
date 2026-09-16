@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}{{ course.name }} · StudyOS{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow" style="color:{{ course.color }}">{{ course.code|default:'COURSE' }}</p>
+    <h1>{{ course.name }}</h1>
+    <p>{{ course.credit }} credits{% if course.teacher %} · {{ course.teacher }}{% endif %} · {{ course.progress }}% syllabus complete</p>
+  </div>
+  <div class="head-actions">
+    <a href="{% url 'course_edit' course.id %}">Edit course</a>
+    <a class="primary" href="{% url 'topic_new' %}?course={{ course.id }}">+ Add topic</a>
+  </div>
+</section>
+
+<section class="course-overview">
+  <article class="panel">
+    <div class="section-head"><h2>Syllabus</h2><a href="{% url 'topics' %}">View all</a></div>
+    {% for topic in topics %}
+      <div class="line">
+        <span class="dot {% if topic.completed %}done{% endif %}"></span>
+        <div><b class="{% if topic.completed %}struck{% endif %}">{{ topic.title }}</b>{% if topic.details %}<small>{{ topic.details|truncatechars:90 }}</small>{% endif %}</div>
+        <a href="{% url 'topic_edit' topic.id %}">Edit</a>
+      </div>
+    {% empty %}<div class="empty">No topics yet. <a href="{% url 'topic_new' %}?course={{ course.id }}">Add the first one.</a></div>{% endfor %}
+  </article>
+
+  <article class="panel">
+    <div class="section-head"><h2>Tasks</h2><a href="{% url 'task_new' %}?course={{ course.id }}">+ Add</a></div>
+    {% for task in tasks %}
+      <div class="line">
+        <span class="dot {{ task.priority }}"></span>
+        <div><b>{{ task.title }}</b><small>{% if task.due_date %}Due {{ task.due_date|date:'d M Y' }} · {% endif %}{{ task.get_priority_display }}</small></div>
+        <a href="{% url 'task_edit' task.id %}">Edit</a>
+      </div>
+    {% empty %}<div class="empty">No tasks linked yet.</div>{% endfor %}
+  </article>
+
+  <article class="panel">
+    <div class="section-head"><h2>Notes</h2><a href="{% url 'note_new' %}?course={{ course.id }}">+ Add</a></div>
+    {% for note in notes %}
+      <div class="line"><div><b>{{ note.title }}</b><small>{{ note.note_date|date:'d M Y' }}</small></div><a href="{% url 'note_edit' note.id %}">Open</a></div>
+    {% empty %}<div class="empty">No notes linked yet.</div>{% endfor %}
+  </article>
+
+  <article class="panel">
+    <div class="section-head"><h2>Upcoming</h2><a href="{% url 'event_new' %}?course={{ course.id }}">+ Add</a></div>
+    {% for event in events %}
+      <div class="line"><span class="date">{{ event.starts_at|date:'d M' }}<small>{{ event.starts_at|time:'H:i' }}</small></span><div><b>{{ event.title }}</b><small>{{ event.get_event_type_display }}</small></div></div>
+    {% empty %}<div class="empty">No upcoming events.</div>{% endfor %}
+  </article>
+</section>
+
+<section class="course-overview">
+  <article class="panel">
+    <div class="section-head"><h2>Grades</h2><a href="{% url 'grade_new' %}?course={{ course.id }}">+ Add</a></div>
+    {% for component in course.components.all %}
+      <div class="line"><div><b>{{ component.label }}</b><small>{{ component.score|default:'—' }} / {{ component.maximum }}</small></div><a href="{% url 'grade_edit' component.id %}">Edit</a></div>
+    {% empty %}<div class="empty">No assessments yet.</div>{% endfor %}
+  </article>
+  <article class="panel">
+    <div class="section-head"><h2>Files</h2><a href="{% url 'file_new' %}?course={{ course.id }}">+ Upload</a></div>
+    {% for file in course.files.all %}<div class="line"><div><b>{{ file.filename }}</b><small>{{ file.uploaded_at|date:'d M Y' }}</small></div><a href="{{ file.file.url }}">Open</a></div>{% empty %}<div class="empty">No files yet.</div>{% endfor %}
+  </article>
+</section>
+{% endblock %}

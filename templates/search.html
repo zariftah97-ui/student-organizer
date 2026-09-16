@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Search · StudyOS{% endblock %}
+{% block content %}
+<section class="page-head"><div><p class="eyebrow">SEARCH</p><h1>{% if q %}Results for “{{ q }}”{% else %}Find anything{% endif %}</h1><p>Courses, topics, tasks, notes, events, and files.</p></div></section>
+{% if q %}
+<div class="search-results">
+  {% if courses %}<section class="panel"><h2>Courses</h2>{% for x in courses %}<a class="result" href="{% url 'course_detail' x.id %}"><b>{{ x.name }}</b> <small>{{ x.code }}</small></a>{% endfor %}</section>{% endif %}
+  {% if topics %}<section class="panel"><h2>Syllabus</h2>{% for x in topics %}<a class="result" href="{% url 'topic_edit' x.id %}"><b>{{ x.title }}</b> <small>{{ x.course.name }}</small></a>{% endfor %}</section>{% endif %}
+  {% if tasks %}<section class="panel"><h2>Tasks</h2>{% for x in tasks %}<a class="result" href="{% url 'task_edit' x.id %}"><b>{{ x.title }}</b>{% if x.course %} <small>{{ x.course.name }}</small>{% endif %}</a>{% endfor %}</section>{% endif %}
+  {% if notes %}<section class="panel"><h2>Notes</h2>{% for x in notes %}<a class="result" href="{% url 'note_edit' x.id %}"><b>{{ x.title }}</b> <small>{{ x.course.name|default:'Personal' }}</small></a>{% endfor %}</section>{% endif %}
+  {% if events %}<section class="panel"><h2>Events</h2>{% for x in events %}<a class="result" href="{% url 'event_edit' x.id %}"><b>{{ x.title }}</b> <small>{{ x.starts_at|date:'d M Y, H:i' }}</small></a>{% endfor %}</section>{% endif %}
+  {% if files %}<section class="panel"><h2>Files</h2>{% for x in files %}<a class="result" href="{{ x.file.url }}"><b>{{ x.filename }}</b> <small>{{ x.course.name|default:'Unsorted' }}</small></a>{% endfor %}</section>{% endif %}
+  {% if not courses and not topics and not tasks and not notes and not events and not files %}<div class="empty large">No matches found.</div>{% endif %}
+</div>
+{% else %}<div class="empty large">Type a search above to explore your study space.</div>{% endif %}
+{% endblock %}

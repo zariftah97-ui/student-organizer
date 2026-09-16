@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Academic setup · StudyOS{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div><p class="eyebrow">ACADEMIC SETUP</p><h1>Your semesters</h1><p>Build the academic structure your courses, marks and progress will use.</p></div>
+  <a class="primary" href="{% url 'semester_new' %}">+ Add semester</a>
+</section>
+<section class="setup-grid">
+  <article class="panel setup-profile">
+    <span class="soft-badge">STUDENT PROFILE</span>
+    <h2>{{ request.user.first_name|default:request.user.username }}</h2>
+    <p class="muted">{{ profile.university|default:'University not set' }}</p>
+    <div class="profile-mini">
+      <span>{{ profile.department|default:'Department not set' }}</span>
+      <span>Batch {{ profile.batch|default:'—' }}</span>
+      <span>ID {{ profile.student_id|default:'—' }}</span>
+    </div>
+    <a class="secondary" href="{% url 'settings' %}">Edit profile</a>
+  </article>
+  <article class="panel">
+    <div class="section-title"><div><span class="soft-badge">SEMESTERS</span><h2>Academic timeline</h2></div></div>
+    <div class="semester-list">
+      {% for semester in semesters %}
+      <div class="semester-card {% if semester.is_current %}current{% endif %}">
+        <div><strong>{{ semester.name }}</strong><p>{{ semester.academic_year }}{% if semester.term %} · {{ semester.term }}{% endif %}</p></div>
+        <div class="semester-actions">
+          {% if semester.is_current %}<span class="current-badge">Current</span>{% else %}<form method="post" action="{% url 'semester_current' semester.id %}">{% csrf_token %}<button class="link-btn" type="submit">Set current</button></form>{% endif %}
+          <a href="{% url 'semester_edit' semester.id %}">Edit</a>
+          <form method="post" action="{% url 'semester_delete' semester.id %}">{% csrf_token %}<button class="danger-btn" type="submit">Delete</button></form>
+        </div>
+      </div>
+      {% empty %}
+      <div class="empty"><strong>No semester yet</strong><br><small>Create your first semester. Courses can then be attached to it.</small></div>
+      {% endfor %}
+    </div>
+  </article>
+</section>
+{% endblock %}
