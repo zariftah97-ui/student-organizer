@@ -1,14 +1,17 @@
 from pathlib import Path
 import os
+import dj_database_url
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-studyos-local-dev-key')
-DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-# Render-এর সকল ডোমেইন ও CSRF ট্রাস্টেড অরিজিন
+# Production Security: Debug Mode OFF
+DEBUG = False
+
+# Render Domain & Hosts Configuration
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = [
     'https://*.onrender.com',
@@ -22,7 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     
-    # Cloudinary Storage Apps (staticfiles-এর ওপরে থাকতে হবে)
+    # Cloudinary Storage Apps (staticfiles-এর উপরে আবশ্যক)
     'cloudinary_storage',
     'django.contrib.staticfiles',
     'cloudinary',
@@ -61,10 +64,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-DATABASES = {'default': {
-    'ENGINE': 'django.db.backends.sqlite3',
-    'NAME': BASE_DIR / 'db.sqlite3',
-}}
+# Database Configuration (Supabase PostgreSQL for Production, SQLite for local)
+DATABASES = {
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600
+    )
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -82,7 +88,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files
 MEDIA_URL = '/media/'

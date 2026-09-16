@@ -18,3 +18,5 @@ urllib3==2.7.0
 whitenoise==6.6.0
 cloudinary
 django-cloudinary-storage
+dj-database-url
+psycopg2-binary
